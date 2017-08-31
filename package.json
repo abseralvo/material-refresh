@@ -2,11 +2,11 @@
   "name": "material-refresh",
   "description": "Material Design pull to refresh, by using CSS3 and JavaScript",
   "version": "0.1.0",
-  "homepage": "https://github.com/lightningtgc/material-refresh",
+  "homepage": "https://github.com/matheushf/material-refresh",
   "author": "gctang <lightningtgc@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "git://github.com/lightningtgc/material-refresh.git"
+    "url": "git://github.com/matheushf/material-refresh.git"
   },  
   "devDependencies": {
     "gulp": "^3.8.10",
