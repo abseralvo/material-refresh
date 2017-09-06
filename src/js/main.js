@@ -1,15 +1,16 @@
 /**
- * Google Material Design Swipe To Refresh.   
+ * Google Material Design Swipe To Refresh.
  * By Gctang(https://github.com/lightningtgc)
  *
  * Three types of refresh:
  * 1. Above or coplanar with another surface
- * 2. Below another surface in z-space. 
+ * 2. Below another surface in z-space.
  * 3. Button action refresh
  *
  */
 
-;(function($){
+;
+(function($) {
     var $scrollEl = $(document.body);
     var $refreshMain, $spinnerWrapper, $arrowWrapper, $arrowMain;
     var scrollEl = document.body;
@@ -24,8 +25,8 @@
 
     var NUM_POS_START_Y = -85;
     var NUM_POS_TARGET_Y = 0; // Where to stop
-    var NUM_POS_MAX_Y = 65;   // Max position for the moving distance
-    var NUM_POS_MIN_Y = -25;  // Min position for the moving distance
+    var NUM_POS_MAX_Y = 65; // Max position for the moving distance
+    var NUM_POS_MIN_Y = -25; // Min position for the moving distance
     var NUM_NAV_TARGET_ADDY = 20; // For custom nav bar
 
     var touchCurrentY;
@@ -36,11 +37,12 @@
     var basePosY = 60;
 
     var onBegin = null;
-    var onBtnBegin= null;
+    var onBtnBegin = null;
     var onEnd = null;
     var onBtnEnd = null;
     var stopAnimatTimeout = null;
-    
+    var scrollAtTop = null;
+
     var refreshNav = '';
 
     var lastTime = new Date().getTime();
@@ -74,7 +76,7 @@
         y2: 0
     }
 
-    // Default options 
+    // Default options
     /* var opts = { */
     /*     scrollEl: '', //String  */
     /*     nav: '', //String */
@@ -87,14 +89,14 @@
     /*     onEnd: null //Function */
     /* } */
 
-    
-    /* Known issue: 
-     * 1. iOS feature when scrolling ,animation will stop  
+
+    /* Known issue:
+     * 1. iOS feature when scrolling ,animation will stop
      * 2. Animation display issue in anfroid like miui小米
      *
      *
      * TODO list:
-     * 1. Using translate and scale together to replace top 
+     * 1. Using translate and scale together to replace top
      * 2. Optimize circle rotate animation
      */
 
@@ -103,7 +105,7 @@
         options = options || {};
 
         scrollEl = options.scrollEl ? options.scrollEl :
-                        isIOS ? scrollEl : document;
+            isIOS ? scrollEl : document;
         $scrollEl = $(scrollEl);
 
         // extend options
@@ -111,6 +113,7 @@
         onEnd = options.onEnd;
         maxRotateTime = options.maxTime || maxRotateTime;
         refreshNav = options.nav || refreshNav;
+        scrollAtTop = options.scrollAtTop || true;
 
         if ($('#muirefresh').length === 0) {
             renderTmpl();
@@ -121,14 +124,14 @@
         $arrowWrapper = $('.mui-arrow-wrapper', $refreshMain);
         $arrowMain = $('.mui-arrow-main', $refreshMain);
 
-        // Custom nav bar 
+        // Custom nav bar
         if (!isDefaultType()) {
             $refreshMain.addClass('mui-refresh-nav');
             basePosY = $(refreshNav).height() + 20;
-            if($(refreshNav).offset()){
+            if ($(refreshNav).offset()) {
                 customNavTop = $(refreshNav).offset().top;
                 // Handle position fix
-                if($(refreshNav).css('position') !== 'fixed'){
+                if ($(refreshNav).css('position') !== 'fixed') {
                     basePosY += customNavTop;
                 }
                 // Set the first Y position
@@ -141,16 +144,16 @@
         }
 
         //Set custom z-index
-        if(options.index){
+        if (options.index) {
             $refreshMain.css('z-index', ~~options.index);
         }
 
         //Set custom top, to change the position
-        if(options.top){
+        if (options.top) {
             $refreshMain.css('top', options.top);
         }
 
-        // Extract theme 
+        // Extract theme
         if (options.theme) {
             $refreshMain.addClass(options.theme);
         } else {
@@ -160,7 +163,7 @@
         // Add Animation Class
         $refreshMain.addClass(mainAnimatClass);
 
-        if(!options.freeze){
+        if (!options.freeze) {
             bindEvents();
         }
     }
@@ -169,7 +172,7 @@
 
     // Finish loading
     mRefresh.resolve = function() {
-        if(!isStoping && stopAnimatTimeout){
+        if (!isStoping && stopAnimatTimeout) {
             clearTimeout(stopAnimatTimeout);
             stopAnimatTimeout = null;
 
@@ -178,7 +181,7 @@
     }
 
     // Destory refresh
-    mRefresh.destroy = function(){
+    mRefresh.destroy = function() {
         unbindEvents();
         $refreshMain.remove();
 
@@ -187,7 +190,7 @@
     // Type3: Button action refresh
     mRefresh.refresh = function(opt) {
         // Do rotate
-        if(!isShowLoading){
+        if (!isShowLoading) {
             var realTargetPos = basePosY + NUM_POS_TARGET_Y - 20;
             isShowLoading = true;
             isBtnAction = true;
@@ -199,7 +202,7 @@
             if (!isDefaultType()) {
                 realTargetPos = realTargetPos + NUM_NAV_TARGET_ADDY;
             }
-            
+
             // Handle freeze
             $refreshMain.show();
             //Romove animat time
@@ -207,31 +210,32 @@
             // move to target position
             $refreshMain.css('top', realTargetPos + 'px');
             // make it small
-            $refreshMain.css('-webkit-transform', 'scale(' + 0.01  + ')');
-            
+            $refreshMain.css('-webkit-transform', 'scale(' + 0.01 + ')');
+
             setTimeout(doRotate, 60);
         }
     }
 
     // Unbind touch events,for freeze type1 and type2
-    mRefresh.unbindEvents = function(){
+    mRefresh.unbindEvents = function() {
         unbindEvents();
     }
 
-    mRefresh.bindEvents = function(){
+    mRefresh.bindEvents = function() {
         bindEvents();
     }
 
     // Render html template
-    function renderTmpl(){
+    function renderTmpl() {
         document.body.insertAdjacentHTML('beforeend', tmpl);
     }
 
 
-    function touchStart(e){
-        if(isIOS && scrollEl == document.body){
+    function touchStart(e) {
+
+        if (isIOS && scrollEl == document.body) {
             touchPos.top = window.scrollY;
-        }else if(scrollEl != document){
+        } else if (scrollEl != document) {
             touchPos.top = document.querySelector(scrollEl).scrollTop;
         } else {
             touchPos.top = (document.documentElement || document.body.parentNode || document.body).scrollTop;
@@ -246,14 +250,15 @@
 
         // Fix jQuery touch event detect
         e = e.originalEvent || e;
-        
+
         if (e.touches[0]) {
             touchPos.x1 = e.touches[0].pageX;
             touchStartY = touchPos.y1 = e.touches[0].pageY;
         }
     }
 
-    function touchMove(e){
+    function touchMove(e) {
+
         var thisTouch, distanceY;
         var now = new Date().getTime();
 
@@ -261,6 +266,11 @@
 
         if (touchPos.top > 0 || isShowLoading || !e.touches || e.touches.length !== 1) {
             // Just allow one finger
+            return;
+        }
+
+        // Stop the refresher if it isn't at the top of the page
+        if (scrollAtTop && document.body.scrollTop !== 0) {
             return;
         }
 
@@ -273,16 +283,16 @@
         distanceY = touchPos.y2 - touchPos.y1;
 
         if (touchPos.y2 - touchStartY + verticalThreshold > 0) {
-            e.preventDefault();  
+            e.preventDefault();
 
             // Some android phone
-            // Throttle, aviod jitter 
+            // Throttle, aviod jitter
             if (now - lastTime < 90) {
                 return;
             }
 
             if (touchCurrentY < basePosY - customNavTop + NUM_POS_MAX_Y) {
-                touchCurrentY += distanceY ;
+                touchCurrentY += distanceY;
                 moveCircle(touchCurrentY);
             } else {
                 // Move over the max position will do the rotate
@@ -297,12 +307,13 @@
         lastTime = now;
     }
 
-    function touchEnd(e){
+    function touchEnd(e) {
+
         if (touchPos.top > 0 || isShowLoading) {
             return;
         }
         e.preventDefault();
-        
+
         if (touchCurrentY > basePosY - customNavTop + NUM_POS_MIN_Y) {
             // Should move over the min position
             doRotate();
@@ -310,24 +321,24 @@
             backToStart();
         }
     }
-    
+
     /**
      * backToStart
      * Return to start position
      */
     function backToStart() {
         var realStartPos = basePosY + NUM_POS_START_Y;
-        if ( isDefaultType() ) {
+        if (isDefaultType()) {
             $refreshMain.css('top', realStartPos + 'px');
-            $refreshMain.css('-webkit-transform', 'scale(' + 0  + ')');
+            $refreshMain.css('-webkit-transform', 'scale(' + 0 + ')');
         } else {
             // Distance must greater than NUM_POS_MIN_Y
             $refreshMain.css('top', customNavTop + 'px');
             /* $refreshMain.css('-webkit-transform', 'translateY(' + realStartPos + 'px)'); */
         }
-        setTimeout(function(){
+        setTimeout(function() {
             // Handle button action
-            if(!isShowLoading){
+            if (!isShowLoading) {
                 $refreshMain.css('opacity', 0);
                 $refreshMain.hide();
             }
@@ -340,14 +351,14 @@
      *
      * @param {number} y
      */
-    function moveCircle(y){
+    function moveCircle(y) {
         var scaleRate = 40;
         var scalePer = y / scaleRate > 1 ? 1 : y / scaleRate < 0 ? 0 : y / scaleRate;
         var currMoveY = basePosY + NUM_POS_START_Y + y;
 
         if (isDefaultType()) {
             // Small to Big
-            $refreshMain.css('-webkit-transform', 'scale(' + scalePer  + ')');
+            $refreshMain.css('-webkit-transform', 'scale(' + scalePer + ')');
         }
         /* $refreshMain.css('-webkit-transform', 'translateY('+ y + 'px)'); */
 
@@ -355,7 +366,7 @@
         // Change the position
         $refreshMain.css('top', currMoveY + 'px');
         $arrowMain.css('-webkit-transform', 'rotate(' + -(y * 3) + 'deg)');
-        /* $arrowMain.css('transform', 'rotate(' + -(y * 3) + 'deg)'); */ 
+        /* $arrowMain.css('transform', 'rotate(' + -(y * 3) + 'deg)'); */
 
     }
 
@@ -365,7 +376,7 @@
      * Rotate the circle,and you can stop it by `mRefresh.resolve()`
      * or it wil stop within the time: `maxRotateTime`
      */
-    function doRotate(){
+    function doRotate() {
         isShowLoading = true;
         // Do button action callback
         if (isBtnAction && typeof onBtnBegin === 'function') {
@@ -378,7 +389,7 @@
         // Make sure display entirely
         $refreshMain.css('opacity', 1);
 
-        if (!isBtnAction) { 
+        if (!isBtnAction) {
             var realTargetPos = basePosY + NUM_POS_TARGET_Y - 20;
             if (!isDefaultType()) {
                 realTargetPos = realTargetPos + NUM_NAV_TARGET_ADDY;
@@ -387,7 +398,7 @@
             /* $refreshMain.css('-webkit-transform', 'translateY(' + realTargetPos + 'px)'); */
         } else {
             $refreshMain.addClass(mainAnimatClass);
-            $refreshMain.css('-webkit-transform', 'scale(' + 1  + ')');
+            $refreshMain.css('-webkit-transform', 'scale(' + 1 + ')');
         }
 
         $arrowWrapper.hide();
@@ -401,21 +412,21 @@
 
     /**
      * Recover Refresh
-     * Hide the circle 
+     * Hide the circle
      */
-    function recoverRefresh(){
+    function recoverRefresh() {
         // For aviod resolve
         isStoping = true;
 
-        // Stop animation 
+        // Stop animation
         $refreshMain.addClass(noShowClass);
 
         $spinnerWrapper.hide();
 
-        setTimeout(function(){
+        setTimeout(function() {
             $refreshMain.removeClass(noShowClass);
             $refreshMain.hide();
-            
+
             backToStart();
 
             $arrowWrapper.show();
@@ -428,9 +439,9 @@
             } else if (typeof onEnd === 'function') {
                 onEnd();
             }
-            
+
             isBtnAction = false;
-            
+
         }, 500);
     }
 
@@ -441,7 +452,7 @@
      * @return {Boolen}
      */
     function isDefaultType() {
-       return $(refreshNav).length === 0;
+        return $(refreshNav).length === 0;
     }
 
     function bindEvents() {
@@ -459,5 +470,4 @@
 
     window.mRefresh = mRefresh;
 
-})(window.Zepto || window.jQuery);
-
+})(window.jQuery);

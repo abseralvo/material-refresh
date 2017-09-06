@@ -3,8 +3,9 @@ var gUglify = require('gulp-uglify');
 var gRename = require('gulp-rename');
 var gStylus = require('gulp-stylus');
 var gMinifyCSS = require('gulp-minify-css');
-var gTranspile  = require('gulp-es6-module-transpiler');
+var gTranspile = require('gulp-es6-module-transpiler');
 var del = require('del');
+var recast = require('recast');
 
 var projectName = 'material-refresh';
 
@@ -25,12 +26,12 @@ var paths = {
 }
 
 // clean
-gulp.task('clean', function(cb){
+gulp.task('clean', function (cb) {
     del([devPath], cb);
 });
 
 // Handle CSS
-gulp.task('stylus', ['clean'], function(){
+gulp.task('stylus', ['clean'], function () {
 
     gulp.src(paths.srcCSS)
         .pipe(gStylus())
@@ -41,32 +42,32 @@ gulp.task('stylus', ['clean'], function(){
 });
 
 // Handle JS
-gulp.task('es6module', ['clean'], function(){
+gulp.task('es6module', ['clean'], function () {
     return gulp.src(paths.srcJS)
-               .pipe(gTranspile({
-                    formatter: 'bundle',
-                    basePath: paths.srcBase
-                }))
-               .pipe(gRename(jsName))
-               .pipe(gulp.dest(paths.destJS))
-               .pipe(gUglify())
-               .pipe(gRename(jsMinName))
-               .pipe(gulp.dest(paths.destJS));
+        .pipe(gTranspile({
+            formatter: 'bundle',
+            basePath: paths.srcBase
+        }))
+        .pipe(gRename(jsName))
+        .pipe(gulp.dest(paths.destJS))
+        .pipe(gUglify())
+        .pipe(gRename(jsMinName))
+        .pipe(gulp.dest(paths.destJS));
 });
 
 // watch change
-gulp.task('watch', function(){
+gulp.task('watch', function () {
     gulp.watch(paths.srcCSS, ['stylus']);
 });
 
-gulp.task('default', [ 'stylus', 'es6module']);
+gulp.task('default', ['stylus', 'es6module']);
 
-gulp.task('build', ['stylus', 'es6module'], function(){
-   return gulp.src(devPath + '/*/*')
+gulp.task('build', ['stylus', 'es6module'], function () {
+    return gulp.src(devPath + '/*/*')
         .pipe(gulp.dest(buildPath));
 });
 
-gulp.task('publish', ['stylus', 'es6module'], function(){
-   gulp.src([devPath + '/css/' + cssMinName, devPath + '/js/' + jsMinName])
+gulp.task('publish', ['stylus', 'es6module'], function () {
+    gulp.src([devPath + '/css/' + cssMinName, devPath + '/js/' + jsMinName])
         .pipe(gulp.dest('./'));
 });
