@@ -223,6 +223,7 @@
     
         function touchStart(e) {
     
+    
             if (isIOS && scrollEl == document.body) {
                 touchPos.top = window.scrollY;
             } else if (scrollEl != document) {
@@ -302,7 +303,7 @@
             if (touchPos.top > 0 || isShowLoading) {
                 return;
             }
-            e.preventDefault();
+            // e.preventDefault();
     
             if (touchCurrentY > basePosY - customNavTop + NUM_POS_MIN_Y) {
                 // Should move over the min position
