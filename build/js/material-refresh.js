@@ -105,6 +105,8 @@
             refreshNav = options.nav || refreshNav;
             scrollAtTop = options.scrollAtTop || true;
     
+            $(refreshNav).css('transition', 'height 0.5s');
+    
             if ($('#muirefresh').length === 0) {
                 renderTmpl();
             }
@@ -300,6 +302,8 @@
     
         function touchEnd(e) {
     
+            $(scrollEl).css('margin-top', 0);
+    
             if (touchPos.top > 0 || isShowLoading) {
                 return;
             }
@@ -353,6 +357,7 @@
             }
             /* $refreshMain.css('-webkit-transform', 'translateY('+ y + 'px)'); */
     
+            $(refreshNav).css('height', y);
             $refreshMain.css('opacity', scalePer);
             // Change the position
             $refreshMain.css('top', currMoveY + 'px');
@@ -369,6 +374,7 @@
          */
         function doRotate() {
             isShowLoading = true;
+            $(refreshNav).css('height', 0);
             // Do button action callback
             if (isBtnAction && typeof onBtnBegin === 'function') {
                 onBtnBegin();
