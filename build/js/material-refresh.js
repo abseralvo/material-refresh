@@ -228,7 +228,7 @@
     
             if (isIOS && scrollEl == document.body) {
                 touchPos.top = window.scrollY;
-            } else if (scrollEl != document) {
+            } else if (scrollEl != document.body) {
                 touchPos.top = document.querySelector(scrollEl).scrollTop;
             } else {
                 touchPos.top = (document.documentElement || document.body.parentNode || document.body).scrollTop;
